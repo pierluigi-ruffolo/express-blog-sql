@@ -15,9 +15,24 @@ function index(req, res) {
   });
 }
 
+/* DESTROY */
+function destroy(req, res) {
+  const id = req.params.id;
+  const sql = "DELETE FROM `posts` WHERE `id` = ?";
+  connection.query(sql, [id], (error) => {
+    if (error) {
+      return res.status(500).json({
+        message: "server error 500",
+      });
+    }
+    res.sendStatus(204);
+  });
+}
+
 /* OGGETTO CHE ESPORTIAMO CON LE OPERAZIONI CRUD */
 const controller = {
   index,
+  destroy,
 };
 
 export default controller;

@@ -6,5 +6,6 @@ router.get("/", postController.index);
 /* SHOW */
 
 /* DESTROY */
+router.delete("/:id", postController.destroy);
 
 export default router;
