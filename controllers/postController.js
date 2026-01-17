@@ -17,8 +17,32 @@ function index(req, res) {
 /* show */
 function show(req, res) {
   const id = req.params.id;
+  const sql =
+    "SELECT * FROM posts INNER JOIN post_tag ON post_tag.post_id = posts.id INNER JOIN tags ON tags.id = post_tag.tag_id WHERE posts.id = ?";
 
-  const sql = "SELECT * FROM posts WHERE id = ?";
+  connection.query(sql, [id], (error, resalts) => {
+    if (error) {
+      return res.status(500).json({
+        message: "server error 500",
+      });
+    }
+    if (resalts.length === 0) {
+      return res.status(404).json({
+        message: "Risorsa non trovata",
+      });
+    }
+    const mapTags = resalts.map((obj) => {
+      return { id: obj.id, label: obj.label };
+    });
+    const response = {
+      id: resalts[0].id,
+      title: resalts[0].title,
+      content: resalts[0].content,
+      tags: mapTags,
+    };
+    res.json(response);
+  });
+  /* const sql = "SELECT * FROM posts WHERE id = ?";
   connection.query(sql, [id], (error, resalts) => {
     if (error) {
       return res.status(500).json({
@@ -46,7 +70,7 @@ function show(req, res) {
         res.json(post);
       });
     }
-  });
+  }); */
 }
 
 /* DESTROY */
