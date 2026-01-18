@@ -18,7 +18,7 @@ function index(req, res) {
 function show(req, res) {
   const id = req.params.id;
   const sql =
-    "SELECT * FROM posts INNER JOIN post_tag ON post_tag.post_id = posts.id INNER JOIN tags ON tags.id = post_tag.tag_id WHERE posts.id = ?";
+    "SELECT  posts.*, tags.id AS `tags_id`, tags.label  FROM posts INNER JOIN post_tag ON post_tag.post_id = posts.id INNER JOIN tags ON tags.id = post_tag.tag_id where posts.id = ?";
 
   connection.query(sql, [id], (error, resalts) => {
     if (error) {
@@ -31,16 +31,19 @@ function show(req, res) {
         message: "Risorsa non trovata",
       });
     }
-    const mapTags = resalts.map((obj) => {
-      return { id: obj.id, label: obj.label };
+    console.log(resalts);
+    const mapLabel = resalts.map((obj) => {
+      return { id: obj.tags_id, label: obj.label };
     });
-    const response = {
+
+    const resalt = {
       id: resalts[0].id,
       title: resalts[0].title,
       content: resalts[0].content,
-      tags: mapTags,
+      tags: mapLabel,
     };
-    res.json(response);
+
+    res.json(resalt);
   });
   /* const sql = "SELECT * FROM posts WHERE id = ?";
   connection.query(sql, [id], (error, resalts) => {
@@ -73,6 +76,24 @@ function show(req, res) {
   }); */
 }
 
+/* STORE */
+
+function store(req, res) {
+  const { title, content, image } = req.body;
+
+  const sql = "INSERT INTO posts (title, content, image) VALUES(?,?,?)";
+  connection.query(sql, [title, content, image], (error, resalt) => {
+    if (error) {
+      return res.status(500).json({
+        error: "error Server 500",
+      });
+    }
+    res.status(201).json({
+      posts: "Posts Creato con successo",
+    });
+  });
+}
+
 /* DESTROY */
 function destroy(req, res) {
   const id = req.params.id;
@@ -92,6 +113,7 @@ const controller = {
   index,
   destroy,
   show,
+  store,
 };
 
 export default controller;
